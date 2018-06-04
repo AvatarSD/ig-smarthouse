@@ -1,0 +1,36 @@
+{
+	"name": "simple button",
+	"owner": "sd",
+	"group": "home",
+	"capabilities":[
+		{
+			"type": "yellow button",
+			"properties":[{ 
+				"current": 0,
+				"type": "bool",
+				"minlen": 1,
+				"maxlen": 1,
+			}],
+			"events":[
+
+			],
+			"permissions": {
+				"users":[
+					{"sd": "rwx"},
+					{"guest": "r"},
+					{"home": "rwx"}
+				],
+				"groups":[
+					{"sd": "rwx"},
+					{"guest": "r"},
+					{"home": "rx"}
+				]
+			},
+			"subscribers": [
+				"192.168.5.60",
+				"button.lan",
+				"www.avatrsd.com"
+			]
+		}
+		]
+}
