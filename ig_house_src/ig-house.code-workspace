@@ -2,14 +2,14 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-			"path": "/opt/esp/ESP8266_RTOS_SDK/components"
 		}
 	],
 	"settings": {
 		"files.associations": {
-			"stdint.h": "c"
+			"stdint.h": "c",
+			"stdio.h": "c",
+			"esp_system.h": "c",
+			"esp_wifi.h": "c"
 		}
 	}
 }

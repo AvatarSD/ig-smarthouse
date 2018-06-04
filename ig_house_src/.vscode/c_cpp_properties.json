@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "/opt/esp/ESP8266_RTOS_SDK/components/lwip",
+                    "/opt/esp/ESP8266_RTOS_SDK/components/esp8266",
+                    "/opt/esp/ESP8266_RTOS_SDK/components/freertos"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "${workspaceFolder}",
+                "/opt/esp/ESP8266_RTOS_SDK/components/lwip/include",
+                "/opt/esp/ESP8266_RTOS_SDK/components/esp8266/include",
+                "/opt/esp/ESP8266_RTOS_SDK/components/freertos/include"
+            ],
+            "defines": [],
+            "compilerPath": "/opt/esp/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
