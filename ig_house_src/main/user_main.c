@@ -11,6 +11,10 @@
 
 #include <esp_system.h>
 
+#include <esp_wifi.h>
+#include <esp_sta.h>
+
+
 /******************************************************************************
  * FunctionName : user_rf_cal_sector_set
  * Description  : SDK just reversed 4 sectors, used for rf init data and paramters.
@@ -63,6 +67,24 @@ uint32_t user_rf_cal_sector_set(void)
     return rf_cal_sec;
 }
 
+static void wifi_event_hand_function(System_Event_t *event)
+{
+    switch (event->event_id) {
+        case EVENT_STAMODE_CONNECTED:
+            break;
+        case EVENT_STAMODE_DISCONNECTED:
+            break;
+        case EVENT_STAMODE_AUTHMODE_CHANGE:
+            break;
+        case EVENT_STAMODE_GOT_IP:
+            break;
+        case EVENT_STAMODE_DHCP_TIMEOUT:
+            break;
+        default:
+            break;
+    }
+}
+
 /******************************************************************************
  * FunctionName : user_init
  * Description  : entry of user application, init user function here
@@ -72,4 +94,16 @@ uint32_t user_rf_cal_sector_set(void)
 void user_init(void)
 {
     printf("SDK version:%s\n", system_get_sdk_version());
+
+    wifi_set_opmode(STATION_MODE);
+
+    struct station_config sta_conf;
+    bzero(&sta_config, sizeof(struct station_config));
+
+
+    sprintf(sta_config.ssid, "Guest N");
+    sprintf(sta_config.password, "toshiba36");
+    wifi_station_set_config(&sta_config);
+    wifi_set_event_handler_cb(wifi_event_hand_function);
+
 }

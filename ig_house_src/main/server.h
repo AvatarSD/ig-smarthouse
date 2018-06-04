@@ -12,10 +12,18 @@
  *      name/version/location/device model/etc
  *  Protocol server
  *  LwIP
+ * 
+ * Init
+ *  Turn on wifi
+ *  Connect to ssid
+ *  Get IP addr
+ *  Create tasts
+ *      1. Listen broadcast port json-rpc
+ *      2. Listen port for lson-rpc
  */
 
 
-
+void run();
 
 
 
