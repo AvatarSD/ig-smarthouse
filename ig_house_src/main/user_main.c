@@ -97,7 +97,7 @@ void user_init(void)
 
     wifi_set_opmode(STATION_MODE);
 
-    struct station_config sta_conf;
+    struct station_config sta_config;
     bzero(&sta_config, sizeof(struct station_config));
 
 

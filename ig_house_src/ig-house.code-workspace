@@ -9,7 +9,8 @@
 			"stdint.h": "c",
 			"stdio.h": "c",
 			"esp_system.h": "c",
-			"esp_wifi.h": "c"
+			"esp_wifi.h": "c",
+			"ip_addr.h": "c"
 		}
 	}
 }
