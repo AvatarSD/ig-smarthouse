@@ -71,14 +71,19 @@ static void wifi_event_hand_function(System_Event_t *event)
 {
     switch (event->event_id) {
         case EVENT_STAMODE_CONNECTED:
+            printf("connected!\n");
             break;
         case EVENT_STAMODE_DISCONNECTED:
+            printf("disconnected!\n");
             break;
         case EVENT_STAMODE_AUTHMODE_CHANGE:
+            printf("auth_changed!\n");
             break;
         case EVENT_STAMODE_GOT_IP:
+            printf("got ip!\n");
             break;
         case EVENT_STAMODE_DHCP_TIMEOUT:
+            printf("dhcp timeout!\n");
             break;
         default:
             break;
@@ -105,5 +110,6 @@ void user_init(void)
     sprintf(sta_config.password, "toshiba36");
     wifi_station_set_config(&sta_config);
     wifi_set_event_handler_cb(wifi_event_hand_function);
+
 
 }
