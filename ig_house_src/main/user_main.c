@@ -106,8 +106,8 @@ void user_init(void)
     bzero(&sta_config, sizeof(struct station_config));
 
 
-    sprintf(sta_config.ssid, "Guest N");
-    sprintf(sta_config.password, "toshiba36");
+    sprintf(sta_config.ssid, "Home N");
+    sprintf(sta_config.password, "5Od_9.iktS@");
     wifi_station_set_config(&sta_config);
     wifi_set_event_handler_cb(wifi_event_hand_function);
 
