@@ -14,6 +14,41 @@
 #include <esp_wifi.h>
 #include <esp_sta.h>
 
+#include <freertos/FreeRTOS.h>
+
+#define	SERVER_PORT	1002
+
+
+void indication_task(void *param)
+{
+
+    vTaskDelete(NULL);
+}
+
+void wifi_manenger_task(void *param)
+{
+
+    vTaskDelete(NULL);
+}
+
+void main_server_task(void *param)
+{
+    printf("server task is running!\n");
+
+    LOCAL int32_t socket;
+
+
+    while(true){
+
+
+
+
+    }
+
+    vTaskDelete(NULL);
+}
+
+
 
 /******************************************************************************
  * FunctionName : user_rf_cal_sector_set
@@ -69,25 +104,50 @@ uint32_t user_rf_cal_sector_set(void)
 
 static void wifi_event_hand_function(System_Event_t *event)
 {
-    switch (event->event_id) {
-        case EVENT_STAMODE_CONNECTED:
-            printf("connected!\n");
-            break;
-        case EVENT_STAMODE_DISCONNECTED:
-            printf("disconnected!\n");
-            break;
-        case EVENT_STAMODE_AUTHMODE_CHANGE:
-            printf("auth_changed!\n");
-            break;
-        case EVENT_STAMODE_GOT_IP:
-            printf("got ip!\n");
-            break;
-        case EVENT_STAMODE_DHCP_TIMEOUT:
-            printf("dhcp timeout!\n");
-            break;
-        default:
-            break;
+    switch (evt->event_id)	
+    {
+    case EVENT_STAMODE_CONNECTED:
+        printf("connect	to	ssid	%s,	channel	%d\n",	
+                evt->event_info.connected.ssid,	
+                evt->event_info.connected.channel);
+    break;
+
+    case EVENT_STAMODE_DISCONNECTED:
+        printf("disconnect	from	ssid	%s,	reason	%d\n",	
+                evt->event_info.disconnected.ssid,	
+                evt->event_info.disconnected.reason);
+    break;
+
+    case EVENT_STAMODE_AUTHMODE_CHANGE:
+        printf("mode:	%d	->	%d\n",	
+                evt->event_info.auth_change.old_mode,	
+                evt->event_info.auth_change.new_mode);
+    break;
+
+    case EVENT_STAMODE_GOT_IP:
+        printf("ip:"	IPSTR	",mask:"	IPSTR	",gw:"	IPSTR,
+                IP2STR(&evt->event_info.got_ip.ip),
+                IP2STR(&evt->event_info.got_ip.mask),
+                IP2STR(&evt->event_info.got_ip.gw));
+        printf("\n");
+    break;
+
+    case EVENT_SOFTAPMODE_STACONNECTED:
+        printf("station:	"	MACSTR	"join,	AID	=	%d\n",	
+                MAC2STR(evt->event_info.sta_connected.mac),	
+                evt->event_info.sta_connected.aid);
+    break;
+
+    case EVENT_SOFTAPMODE_STADISCONNECTED:
+        printf("station:	"	MACSTR	"leave,	AID	=	%d\n",
+                MAC2STR(evt->event_info.sta_disconnected.mac),	
+                evt->event_info.sta_disconnected.aid);
+    break;
+
+    default:
+    break;
     }
+
 }
 
 /******************************************************************************
@@ -111,5 +171,8 @@ void user_init(void)
     wifi_station_set_config(&sta_config);
     wifi_set_event_handler_cb(wifi_event_hand_function);
 
+    xTaskCreate(main_server_task, "indication_task", 64, NULL, 2, NULL);
+    xTaskCreate(main_server_task, "wifi_manenger_task", 128, NULL, 2, NULL);
+    xTaskCreate(main_server_task, "net_server_json", 256, NULL, 2, NULL);
 
 }
