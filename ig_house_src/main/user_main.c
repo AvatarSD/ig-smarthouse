@@ -26,13 +26,26 @@
 
 void indication_task(void *param)
 {
-
+    while(true);
     vTaskDelete(NULL);
 }
 
 void wifi_manenger_task(void *param)
 {
+    while(true){
 
+    int8_t rssi = wifi_station_get_rssi();
+    STATION_STATUS status = wifi_station_get_connect_status();
+    printf("rssi: %d; status: %d\n", rssi, status);
+
+     /* Block for 500ms. */
+    const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
+
+
+    vTaskDelay(xDelay);
+
+    }
+    
     vTaskDelete(NULL);
 }
 
@@ -42,13 +55,8 @@ void main_server_task(void *param)
 
     int32_t socket;
 
+    while(true);
 
-    while(true){
-
-
-
-
-    }
 
     vTaskDelete(NULL);
 }
