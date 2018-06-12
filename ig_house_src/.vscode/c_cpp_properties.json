@@ -5,7 +5,7 @@
             "browse": {
                 "path": [
                     "${workspaceFolder}",
-                    "/opt/esp/ESP8266_RTOS_SDK/components/lwip",
+                    "/opt/esp/ESP8266_RTOS_SDK/include",
                     "/opt/esp/ESP8266_RTOS_SDK/components/esp8266",
                     "/opt/esp/ESP8266_RTOS_SDK/components/freertos"
                 ],

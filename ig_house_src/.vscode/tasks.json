@@ -6,26 +6,36 @@
         {
             "label": "clean",
             "type": "shell",
-            "command": "make clean"
+            "command": "make clean",
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "build",
             "type": "shell",
-            "command": "make"
+            "command": "make",
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "all",
             "type": "shell",
             "command": "make all",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "flash",
             "type": "shell",
             "command": "make flash",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": [
                 "$gcc"
             ]
