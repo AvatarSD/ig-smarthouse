@@ -8,13 +8,18 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <strings.h>
 
-#include <esp_system.h>
+#include "sdkconfig.h"
 
-#include <esp_wifi.h>
-#include <esp_sta.h>
+#include "esp_misc.h"
+#include "esp_sta.h"
+#include "esp_system.h"
 
-#include <freertos/FreeRTOS.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#include <sys/socket.h>
 
 #define	SERVER_PORT	1002
 
@@ -35,7 +40,7 @@ void main_server_task(void *param)
 {
     printf("server task is running!\n");
 
-    LOCAL int32_t socket;
+    int32_t socket;
 
 
     while(true){
@@ -102,7 +107,7 @@ uint32_t user_rf_cal_sector_set(void)
     return rf_cal_sec;
 }
 
-static void wifi_event_hand_function(System_Event_t *event)
+static void wifi_event_hand_function(System_Event_t *evt)
 {
     switch (evt->event_id)	
     {
@@ -171,8 +176,8 @@ void user_init(void)
     wifi_station_set_config(&sta_config);
     wifi_set_event_handler_cb(wifi_event_hand_function);
 
-    xTaskCreate(main_server_task, "indication_task", 64, NULL, 2, NULL);
-    xTaskCreate(main_server_task, "wifi_manenger_task", 128, NULL, 2, NULL);
+    xTaskCreate(indication_task, "indication_task", 64, NULL, 2, NULL);
+    xTaskCreate(wifi_manenger_task, "wifi_manenger_task", 128, NULL, 2, NULL);
     xTaskCreate(main_server_task, "net_server_json", 256, NULL, 2, NULL);
 
 }
