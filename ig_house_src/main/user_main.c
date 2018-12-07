@@ -21,6 +21,8 @@
 
 #include <sys/socket.h>
 
+#include "cJSON.h"
+
 #define	SERVER_PORT	1002
 
 
@@ -36,12 +38,14 @@ void wifi_manenger_task(void *param)
 
     int8_t rssi = wifi_station_get_rssi();
     STATION_STATUS status = wifi_station_get_connect_status();
-    printf("rssi: %d; status: %d\n", rssi, status);
+    printf("rssi: %d; status: %d  ", rssi, status);
+    printf("heap: %d\n", system_get_free_heap_size());
+
 
      /* Block for 500ms. */
     const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 
-
+    //printf("stak: %d\n", uxHighWuxTaskGetStackHighWaterMark( NULL ));
     vTaskDelay(xDelay);
 
     }
@@ -53,14 +57,113 @@ void main_server_task(void *param)
 {
     printf("server task is running!\n");
 
-    int32_t socket;
+    	int s, ns;
+	int pid;
+	int nport;
+	struct sockaddr_in serv_addr, clnt_addr;
+	struct  hostent *hp;
+	char buf[80], hname[80];
+	nport = 1500;
+	nport = htons((u_short)nport);
 
-    while(true);
+	if((s = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		perror("socket() error");
+		exit(1);
+	}
+
+	bzero(&serv_addr, sizeof(serv_addr));
+
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_port = nport;
+
+	if(bind(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr))==-1) {
+		perror("bind() error");
+		exit(1);
+	}
+
+	fprintf(stderr, "Server is ready: %s\n", inet_ntoa(serv_addr.sin_addr));
+
+	if (listen(s,5) == -1) {
+		perror("listen() error");
+		exit(1);
+	}
+
+	while(1)
+	{
+
+		int addrlen;
+
+		bzero(&clnt_addr, sizeof(clnt_addr));
+		addrlen = sizeof(clnt_addr);
+
+		if ((ns = accept(s, (struct sockaddr *)&clnt_addr, &addrlen))==-1) {
+			perror("accept() error");
+			exit(1);
+		}
+
+		fprintf(stderr, "Client = %s\n", inet_ntoa(clnt_addr.sin_addr));
+
+	//////	if((pid=fork())==-1) {
+	///		perror("fork() error");
+		//	exit(1);
+		//}
+
+	//	if(pid==0) {
+			int nbytes;
+			int fout;
+
+		//	close(s);
+			while((nbytes = recv(ns, buf, sizeof(buf), 0))!=0) 
+            {
+
+                cJSON *json = cJSON_Parse(buf);
+
+                if(!json){
+                    perror("JSON parse error!\n");
+                    continue;
+                }
+
+                char *string = cJSON_Print(json);
+
+				send(ns, string, strlen(string), 0);
+
+                cJSON_Delete(json);
+                free(string);			
+			}
+			//close(ns);
+		//	exit(0);
+	//	}
+    printf("disconnected!\n");
+
+		close(ns);
+	}
+
 
 
     vTaskDelete(NULL);
 }
 
+void user_conn_init(void)
+{
+    int ret;
+
+        xTaskCreate(indication_task, "indication_task", 64, NULL, 2, NULL);
+    xTaskCreate(wifi_manenger_task, "wifi_manenger_task", 256, NULL, 2, NULL);
+    xTaskCreate(main_server_task, "net_server_json", 256, NULL, 2, NULL);
+
+/*    ret = xTaskCreate(openssl_server_thread,
+                      OPENSSL_SERVER_THREAD_NAME,
+                      OPENSSL_SERVER_THREAD_STACK_WORDS,
+                      NULL,
+                      OPENSSL_SERVER_THREAD_PRORIOTY,
+                      &openssl_handle);
+
+    if (ret != pdPASS)  {
+        printf("create thread %s failed\n", OPENSSL_SERVER_THREAD_NAME);
+        return ;
+    }*/
+}
 
 
 /******************************************************************************
@@ -143,6 +246,8 @@ static void wifi_event_hand_function(System_Event_t *evt)
                 IP2STR(&evt->event_info.got_ip.mask),
                 IP2STR(&evt->event_info.got_ip.gw));
         printf("\n");
+        printf("sta got ip , creat task %d\n", system_get_free_heap_size());
+        user_conn_init();
     break;
 
     case EVENT_SOFTAPMODE_STACONNECTED:
@@ -172,7 +277,8 @@ static void wifi_event_hand_function(System_Event_t *evt)
 void user_init(void)
 {
     printf("SDK version:%s\n", system_get_sdk_version());
-
+    printf("SDK version:%s %d\n", system_get_sdk_version(), system_get_free_heap_size());
+    
     wifi_set_opmode(STATION_MODE);
 
     struct station_config sta_config;
@@ -181,11 +287,11 @@ void user_init(void)
 
     sprintf(sta_config.ssid, "Home N");
     sprintf(sta_config.password, "5Od_9.iktS@");
+
+//    sprintf(sta_config.ssid, "AndroidAP_1449");
+  //  sprintf(sta_config.password, "12345678");
+
     wifi_station_set_config(&sta_config);
     wifi_set_event_handler_cb(wifi_event_hand_function);
-
-    xTaskCreate(indication_task, "indication_task", 64, NULL, 2, NULL);
-    xTaskCreate(wifi_manenger_task, "wifi_manenger_task", 128, NULL, 2, NULL);
-    xTaskCreate(main_server_task, "net_server_json", 256, NULL, 2, NULL);
 
 }
