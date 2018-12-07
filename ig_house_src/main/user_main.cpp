@@ -9,7 +9,6 @@
 #include <stdint.h>
 #include <strings.h>
 
-extern "C"{
 #include "sdkconfig.h"
 
 #include "esp_misc.h"
@@ -22,7 +21,6 @@ extern "C"{
 #include <sys/socket.h>
 
 #include "cJSON.h"
-}
 
 #include "server.h"
 

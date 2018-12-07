@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern "C" {
 #include "sdkconfig.h"
 
 #include "esp_misc.h"
@@ -16,7 +15,6 @@ extern "C" {
 #include <sys/socket.h>
 
 #include "cJSON.h"
-}
 
 
 JsonServer::JsonServer(bool is_bcast, QueueHandle_t out_queue)
