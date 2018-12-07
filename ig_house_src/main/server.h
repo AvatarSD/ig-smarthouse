@@ -22,8 +22,28 @@
  *      2. Listen port for lson-rpc
  */
 
+#include "inttypes.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
 
-void run();
+
+class JsonServer
+{
+public:
+    JsonServer(bool is_bcast, QueueHandle_t out_queue);
+    ~JsonServer();
+
+
+    int start(uint16_t port);
+    void stop();
+
+    int run();
+
+private:
+    QueueHandle_t out_queue;
+    int s;
+};
+
 
 
 

@@ -5,11 +5,11 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-
 #include <stdio.h>
 #include <stdint.h>
 #include <strings.h>
 
+extern "C"{
 #include "sdkconfig.h"
 
 #include "esp_misc.h"
@@ -22,8 +22,15 @@
 #include <sys/socket.h>
 
 #include "cJSON.h"
+}
+
+#include "server.h"
 
 #define	SERVER_PORT	1002
+
+
+
+QueueHandle_t server_queue;
 
 
 void indication_task(void *param)
@@ -56,99 +63,29 @@ void wifi_manenger_task(void *param)
 void main_server_task(void *param)
 {
     printf("server task is running!\n");
+    
+    JsonServer server(false, server_queue);
+    
+    for(;;)
+    {  
+        if(server.start(1500)){
+            perror("server start error!\n");
+        }
 
-    	int s, ns;
-	int pid;
-	int nport;
-	struct sockaddr_in serv_addr, clnt_addr;
-	struct  hostent *hp;
-	char buf[80], hname[80];
-	nport = 1500;
-	nport = htons((u_short)nport);
+        if(server.run()){
+            perror("server runtime error!\n");
+        }
 
-	if((s = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		perror("socket() error");
-		exit(1);
-	}
-
-	bzero(&serv_addr, sizeof(serv_addr));
-
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
-	serv_addr.sin_port = nport;
-
-	if(bind(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr))==-1) {
-		perror("bind() error");
-		exit(1);
-	}
-
-	fprintf(stderr, "Server is ready: %s\n", inet_ntoa(serv_addr.sin_addr));
-
-	if (listen(s,5) == -1) {
-		perror("listen() error");
-		exit(1);
-	}
-
-	while(1)
-	{
-
-		int addrlen;
-
-		bzero(&clnt_addr, sizeof(clnt_addr));
-		addrlen = sizeof(clnt_addr);
-
-		if ((ns = accept(s, (struct sockaddr *)&clnt_addr, &addrlen))==-1) {
-			perror("accept() error");
-			exit(1);
-		}
-
-		fprintf(stderr, "Client = %s\n", inet_ntoa(clnt_addr.sin_addr));
-
-	//////	if((pid=fork())==-1) {
-	///		perror("fork() error");
-		//	exit(1);
-		//}
-
-	//	if(pid==0) {
-			int nbytes;
-			int fout;
-
-		//	close(s);
-			while((nbytes = recv(ns, buf, sizeof(buf), 0))!=0) 
-            {
-
-                cJSON *json = cJSON_Parse(buf);
-
-                if(!json){
-                    perror("JSON parse error!\n");
-                    continue;
-                }
-
-                char *string = cJSON_Print(json);
-
-				send(ns, string, strlen(string), 0);
-
-                cJSON_Delete(json);
-                free(string);			
-			}
-			//close(ns);
-		//	exit(0);
-	//	}
-    printf("disconnected!\n");
-
-		close(ns);
-	}
-
-
-
+        server.stop();
+    }
     vTaskDelete(NULL);
 }
 
 void user_conn_init(void)
 {
-    int ret;
+    server_queue = xQueueCreate(10, sizeof(cJSON*));
 
-        xTaskCreate(indication_task, "indication_task", 64, NULL, 2, NULL);
+    xTaskCreate(indication_task, "indication_task", 64, NULL, 2, NULL);
     xTaskCreate(wifi_manenger_task, "wifi_manenger_task", 256, NULL, 2, NULL);
     xTaskCreate(main_server_task, "net_server_json", 256, NULL, 2, NULL);
 
@@ -178,7 +115,7 @@ void user_conn_init(void)
  * Parameters   : none
  * Returns      : rf cal sector
 *******************************************************************************/
-uint32_t user_rf_cal_sector_set(void)
+extern "C" uint32_t user_rf_cal_sector_set(void)
 {
     flash_size_map size_map = system_get_flash_size_map();
     uint32_t rf_cal_sec = 0;
@@ -274,7 +211,7 @@ static void wifi_event_hand_function(System_Event_t *evt)
  * Parameters   : none
  * Returns      : none
 *******************************************************************************/
-void user_init(void)
+extern "C" void user_init(void)
 {
     printf("SDK version:%s\n", system_get_sdk_version());
     printf("SDK version:%s %d\n", system_get_sdk_version(), system_get_free_heap_size());
@@ -285,8 +222,8 @@ void user_init(void)
     bzero(&sta_config, sizeof(struct station_config));
 
 
-    sprintf(sta_config.ssid, "Home N");
-    sprintf(sta_config.password, "5Od_9.iktS@");
+    sprintf((char*)sta_config.ssid, "Home N");
+    sprintf((char*)sta_config.password, "5Od_9.iktS@");
 
 //    sprintf(sta_config.ssid, "AndroidAP_1449");
   //  sprintf(sta_config.password, "12345678");
