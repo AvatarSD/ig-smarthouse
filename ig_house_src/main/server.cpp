@@ -7,9 +7,9 @@
 
 #include "sdkconfig.h"
 
-#include "esp_misc.h"
-#include "esp_sta.h"
-#include "esp_system.h"
+// #include "esp_misc.h"
+// #include "esp_sta.h"
+// #include "esp_system.h"
 
 #include "freertos/task.h"
 #include <sys/socket.h>

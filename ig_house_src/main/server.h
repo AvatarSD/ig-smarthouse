@@ -26,8 +26,64 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
+// #include <memory>
+// #include <vector>
+/*
+class Socket
+{
 
-class JsonServer
+};
+
+class RawMessage
+{
+public:
+
+private:
+    std::shared_ptr<Socket> soket;
+    std::vector<uint8_t> data; 
+};
+
+template<typename T>
+class Queue
+{
+public:
+    Queue(){}
+    ~Queue(){}
+    void put(T&data){
+
+    }
+    T& get(){
+
+    } 
+private:
+    QueueHandle_t xQueue;
+};
+
+
+class Server
+{
+    Server(bool is_bcast, Queue<RawMessage> *out_queue);
+};
+
+class Client
+{
+    void send();
+};
+
+template<class T_Server, class T_Client>
+class NetWorker
+{
+public:
+    NetWorker(){}
+
+private:
+    Queue<RawMessage> inQueue;
+    Queue<RawMessage> outQueue;
+
+    T_Server server;
+};
+*/
+class JsonServer// : Server
 {
 public:
     JsonServer(bool is_bcast, QueueHandle_t out_queue);
